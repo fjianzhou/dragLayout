@@ -60,7 +60,7 @@ block--modifier代表 block 的不同状态或不同版本
     
     - draggableHandle: ?string = '.className'  处了有这个类名的标签元素可以拖住移动，其他元素均不可拖住移动
     
-    - compactType: ?('vertical' | 'horizontal') = 'vertical'  排布优先垂直或水平 
+    - compactType: ?('vertical' | 'horizontal') = 'vertical'  排布优先垂直或水平  
     
     - verticalCompact: ?boolean = true    排布优先垂直 
     
@@ -234,7 +234,12 @@ static getDerivedStateFromProps （nextProps ，prevState） 16.4新增  将prop
       - default
         - false 
 
--  onAlign 对齐后调用callback
+    - overflow 如果超出以后自动计算位置
+      - type 
+        - object    {adjustX: true, adjustY: true}
+      - default 
+
+- onAlign 对齐后调用callback
 
   -  function(source:HTMLElement, align:Object) 
 
@@ -268,3 +273,7 @@ render() {
 
 
 ？？？？transform matrix函数
+
+
+
+？？ customize-cra   react-app-rewired

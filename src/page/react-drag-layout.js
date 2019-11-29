@@ -1,7 +1,8 @@
 import React from "react";
-import ReactGridLayout from "react-grid-layout";
+import ReactGridLayout,{WidthProvider} from "react-grid-layout";
 import Panel from '../components/panel'
 import 'react-grid-layout/css/styles.css'
+const GridLayout = WidthProvider(ReactGridLayout);
 let container = {
   background: "#e1e1e1",
   width: "100%"
@@ -13,17 +14,18 @@ class ReactDragLayout extends React.Component {
       layoutData: [
         {
           key: "a",
-          title: "sss"
+          title: "a"
         },
         {
           key: "b",
-          title: "a标题a标题a标题a标题"
+          title: "b"
         },
         {
           key: "c",
           title: "c标题"
         }
-      ]
+      ],
+      cols:9
     };
   }
   onLayoutChange(layout){
@@ -43,20 +45,24 @@ class ReactDragLayout extends React.Component {
   render() {
     let { layoutData } = this.state;
     var layout = [
-        {i: 'a', x: 12, y: 0, w: 3, h: 3},
+        {i: 'a', x: 12, y: 3, w: 3, h: 3},
         {i: 'b', x: 12, y: 3, w: 3, h: 3},
-        {i: 'c', x: 0, y: 6, w: 3, h: 3}
+        {i: 'c', x: 12, y: 6, w: 3, h: 3}
     ];
     
     return (
       <div style={container}>
-        <ReactGridLayout className="layout" verticalCompact={true} onDrag={this.onDrag} onLayoutChange={this.onLayoutChange} preventCollision={true}   draggableCancel={'.panel-content'} layout={layout} rowHeight={50} cols={12} width={1200}>
+        <GridLayout className="layout" verticalCompact={true} onDrag={this.onDrag} onLayoutChange={this.onLayoutChange} preventCollision={true}   draggableCancel={'.panel-content'} layout={layout} rowHeight={50} cols={this.state.cols} width={1200}>
           {layoutData.map(item => (
             <div key={item.key} onClick={()=> this.onClick(item)}>
                 <Panel data={item}></Panel>
             </div>
           ))}
-        </ReactGridLayout>
+        </GridLayout>
+
+        <button onClick={()=>{ this.setState({cols: this.state.cols + 1})}}>加</button>
+        <button onClick={()=>{ this.setState({cols: this.state.cols - 1})}}>加</button>
+        {this.state.cols}
       </div>
     );
   }

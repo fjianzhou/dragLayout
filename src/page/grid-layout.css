@@ -73,3 +73,8 @@
   border: 1px solid #747E90;
   border-radius: 4px;
 }
+
+.modelSelect {
+  background: #FFFFFF;
+  border: 1px solid #4D68FF !important;
+}

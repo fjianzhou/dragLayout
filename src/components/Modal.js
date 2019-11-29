@@ -1,74 +1,103 @@
-import React from 'react';
-import styled from 'styled-components';
-import ModalPortal from './ModalPortal'
-
+import React from "react";
+import styled from "styled-components";
+import { unmountComponentAtNode } from "react-dom";
+import Icon from "@lugia/lugia-web/dist/icon";
+import RCAlign from "rc-align";
 const ModalContainer = styled.div`
-  position:absolute;
-  left:${(props) => props.position.left || '50%'};
-  top:${(props) =>props.position.top || '50%'};
-  transform:${(props) => props.position.left ? '' : 'translate(-50%,-50%)'};
-  background: #FFFFFF;
-  box-shadow: 0 0 10px 0 rgba(0,0,0,0.20);
+  position: absolute;
+  left: ${props => props.position.left || "50%"};
+  top: ${props => props.position.top || "50%"};
+  transform: ${props => (props.position.left ? "" : "translate(-50%,-50%)")};
+  background: #ffffff;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
   border-radius: 4px;
-  padding:18px;
-`
-const ModalHead = styled.div`
-  line-height:20px;
-`
+  padding: 18px;
+  width: 236px;
+`;
 const ModalContent = styled.div`
-  line-height:20px;
-`
+  line-height: 22px;
+  font-family: PingFangSC-Medium;
+  font-size: 16px;
+  color: #50575d;
+`;
+const ModalIcon = styled.span`
+  font-family: PingFangSC-Medium;
+  font-size: 18px;
+  color: #f22735;
+  vertical-align: middle;
+  margin-right:12px;
+`;
 const ModalFooter = styled.div`
-  padding-bottom:16px;
-  padding-top:16px; 
+  padding-bottom: 16px;
+  padding-top: 16px;
   font-family: PingFangSC-Regular;
   font-size: 14px;
-`
+  display:flex;
+  justify-content:center;
+`;
 const ButtonOk = styled.span`
-  width:66px;
-  height:24px;
-  line-height:24px;
-  background: #F22735;
+  width: 66px;
+  height: 24px;
+  line-height: 24px;
+  background: #f22735;
   border-radius: 4px;
-  color: #FFFFFF;
-  text-align: center;  
-  display: inline-block;
-  vertical-align: middle;
-`
-const ButtonCancel = styled.span`
-  width:66px;
-  height:24px;
-  line-height:24px;
-  border: 1px solid #F22735;
-  border-radius: 4px;
-  color: #F22735;
+  color: #ffffff;
   text-align: center;
   display: inline-block;
   vertical-align: middle;
-`
-export default class Modal extends React.PureComponent{
-  constructor(){
-    super();
-    this.state={
-      visible: true
+`;
+const ButtonCancel = styled.span`
+  width: 66px;
+  height: 24px;
+  line-height: 24px;
+  border: 1px solid #f22735;
+  border-radius: 4px;
+  color: #f22735;
+  text-align: center;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left:10px;
+`;
+export default class Modal extends React.PureComponent {
+  constructor(props) {
+    super(props);
+    console.log(this.props);
+    this.props.maskNode.addEventListener("click", this.handleClick);
+  }
+  remove = () => {
+    let { bodyOverflow, maskNode } = this.props;
+    unmountComponentAtNode(maskNode);
+    maskNode.style.display = "none";
+    maskNode.style.visibility = "hidden";
+    document.body.style.overflow = bodyOverflow;
+  };
+  handleClick = e => {
+    const target = e.path[0];
+    console.log(e, target);
+    if (target === this.props.maskNode) {
+      this.remove();
     }
+  };
+  componentWillUnmount() {
+    this.props.maskNode.removeEventListener("click", this.handleClick);
   }
-  onClick = ()=>{
-    this.setState({visible:false})
-  }
-  render(){
-    let {position = {}} = this.props;
+  render() {
+    let { position = {}, target, align } = this.props;
     return (
-      <ModalPortal visible = {this.state.visible}>
+      <RCAlign align={align} target={() => target}>
         <ModalContainer position={position}>
-          <ModalHead>头部</ModalHead>
-          <ModalContent>内容</ModalContent>
+          <ModalContent>
+            <ModalIcon>
+              <Icon iconClass={"lugia-icon-reminder_exclamation_circle"} />
+            </ModalIcon>
+            确定删除此卡片？
+          </ModalContent>
           <ModalFooter>
             <ButtonOk>确定</ButtonOk>
-            <ButtonCancel onClick={this.onClick}>取消</ButtonCancel>
+            <ButtonCancel onClick={this.remove}>取消</ButtonCancel>
           </ModalFooter>
         </ModalContainer>
-      </ModalPortal>
-    )
+      </RCAlign>
+    );
   }
 }

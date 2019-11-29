@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { WidthProvider, Responsive } from "react-grid-layout";
+import ReactGridLayout,{WidthProvider} from "react-grid-layout";
 import "./grid-layout.css";
 import MyTest from "../components/my-test";
 import Icon from "@lugia/lugia-web/dist/icon";
@@ -10,12 +10,13 @@ import Theme from "@lugia/lugia-web/dist/theme";
 import Widgets from "@lugia/lugia-web/dist/consts";
 import { getBorder } from "@lugia/theme-utils";
 import { Modal } from "../components";
-import RCAlign from "rc-align";
-const GridLayout = WidthProvider(Responsive);
+import config from '../indexPageConfig'
+console.log('config',config)
+
+const GridLayout = WidthProvider(ReactGridLayout);
 
 const layoutStyle = {
   background: "#F5F5F9",
-  height: "1000px"
 };
 
 const GridItemContainer = styled.div`
@@ -149,6 +150,7 @@ const CarouselContainer = styled.div`
   position:fixed;
   bottom:-300px;
   right: 57px;
+  transition: bottom .3s;
   background: #F2F2F2;
   box-shadow: 0 2px 6px 0 rgba(0,0,0,0.10);
   border-radius: 4px;
@@ -340,11 +342,25 @@ const sliderView = {
   // margin: { top: 10, right: 20, bottom: 30, left: 40 },
   // padding: { top: 10, right: 20, bottom: 30, left: 40 },
 };
+let gridCofing ={
+  cols: 12,
+  rowHeight:50,
+}
+
+const initGridItem = () => {
+  let girdItemData = [];
+  for (let i =0; i<5; i++){
+    let item = {
+      key: item,
+      x: i * 2,
+      y: 0,
+      w: 6,
+      h: 3
+    }
+  }
+}
+
 class ReactDragLayout extends React.Component {
-  static defaultProps = {
-    cols: { lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 },
-    rowHeight: 50
-  };
   constructor() {
     super();
     this.state = {
@@ -363,58 +379,16 @@ class ReactDragLayout extends React.Component {
       value: 1,
       value1: 2,
       isEdit: false,
-      listImg: [
-        {
-          title: "美女",
-          url:
-            "http://attach.bbs.miui.com/forum/201811/19/072123rjmrmsjnuv3msepw.jpeg"
-        },
-        {
-          title: "美女1",
-          url:
-            "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1574768495800&di=a22024085e9d6338f8af62d7c65bb349&imgtype=0&src=http%3A%2F%2Fpic1.win4000.com%2Fwallpaper%2F2018-05-22%2F5b03acbf22dc6.jpg"
-        },
-        {
-          title: "美女2",
-          url:
-            "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1574768495799&di=eebd24b7a0dd5ad2b3532cc36996b014&imgtype=0&src=http%3A%2F%2Fpic1.win4000.com%2Fwallpaper%2F2018-11-02%2F5bdbfc417ee53.png"
-        },
-        {
-          title: "美女3",
-          url:
-            "http://img.zcool.cn/community/01c31a5dc24dbca8012163babc1e2a.jpg@2o.jpg"
-        },
-        {
-          title: "美女4",
-          url:
-            "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1574768495799&di=04e7a2bf2bcf808d49caaa4a8b29bc86&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201208%2F30%2F20120830032847_d3QFd.jpeg"
-        },
-        {
-          title: "美女5",
-          url:
-            "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1574768495796&di=1f65d4e766f613064634ce200c3e3868&imgtype=0&src=http%3A%2F%2Fpic1.win4000.com%2Fwallpaper%2F2018-09-30%2F5bb06b4c4d3bd.png"
-        },
-        {
-          title: "美女6",
-          url:
-            "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1574768552549&di=7b27109a558944062744d5faf814cc48&imgtype=0&src=http%3A%2F%2Fpic1.win4000.com%2Fwallpaper%2F6%2F589c2dec7b111.jpg"
-        },
-        {
-          title: "美女6",
-          url:
-            "http://img.zcool.cn/community/01ff9e57518a1d6ac72525aecf8785.jpg"
-        },
-        {
-          title: "美女7",
-          url:
-            "http://img.zcool.cn/community/01c31a5dc24dbca8012163babc1e2a.jpg@2o.jpg"
-        }
-      ],
-      imgIndex: 0,
+      listImg: [...config],
+      imgIndex: 0, 
       offsetX: 0,
       allWidth: 30000,
       visible: false,
-      position: {}
+      position: {},
+      modelSelect: '',
+      xx: null,
+      cols: gridCofing.cols,
+      rowHeight: gridCofing.rowHeight
     };
   }
   onDragStart = (layout, oldItem, newItem, placeholder, e, element) => {
@@ -462,8 +436,8 @@ class ReactDragLayout extends React.Component {
    */
   openOperationPanel = () => {
     this.state.floatingWindowState === 0
-      ? this.setState({ floatingWindowState: 1, isEdit: true })
-      : this.setState({ floatingWindowState: 0, isEdit: false });
+      ? this.setState({ floatingWindowState: 1, isEdit: true, selectLayout: -1 })
+      : this.setState({ floatingWindowState: 0, isEdit: false, selectLayout: -1 });
   };
   /**
    * 关闭操作面板
@@ -525,35 +499,46 @@ class ReactDragLayout extends React.Component {
   }
 
   deleteGridItem = e => {
-    console.log(e.clientX - 40, e.clientY + 20);
-    this.setState({
-      visible: true,
-      position: { left: (e.clientX - 40)+'px', top: (e.clientY + 20)+'px' }
-    });
+    Modal.delete({
+      align: {
+        points: ["tr", "bl"],
+        offset: [-12, 12],
+        useCssTransform: true,
+        overflow: { adjustX: true, adjustY: true }
+      },
+      target: this.$container,
+      position: { left: (e.clientX - 40)+'px', top: (e.clientY + 20)+'px'}
+    })
   };
 
   containerRef = ele => {
     this.$container = ele;
   };
 
-  getTarget = () => {
-    if (!this.$container) {
-      this.$container = document.getElementById('xxxxx');
-    }
-    return this.$container;
-  };
+  userTheme = () =>{
+    let tem =  config.filter((item)=>{
+      return item.id === this.state.modelSelect
+    })
+    this.setState({xx:tem[0].fn,selectLayout:-1});
+  }
+  cancelSelect = () => {
+    this.setState({selectLayout:-1})
+  }
+  selectModule = (item) => {this.setState({modelSelect:item.id})}
 
   render() {
     let dataItem = this.state.items;
+    console.log(this.state.cols)
     return (
       <React.Fragment>
         <GridLayout
+          cols={this.state.cols}
           isDraggable={this.state.isEdit}
           isResizable={this.state.isEdit}
           style={layoutStyle}
           verticalCompact={false}
           onDrag={this.onDrag}
-          rowHeight={this.props.rowHeight}
+          rowHeight={this.state.rowHeight}
           onDragStart={this.onDragStart}
           onDragStop={this.onDragStop}
           onResize={() => {}}
@@ -578,7 +563,7 @@ class ReactDragLayout extends React.Component {
                   />
                 </DeleteWrap>
               )}
-              <MyTest></MyTest>
+              {item.component && <item.component/>}
             </GridItemContainer>
           ))}
         </GridLayout>
@@ -654,7 +639,7 @@ class ReactDragLayout extends React.Component {
                 </Theme>
               </div>
             </div>
-            <div className="add_panel_wrap">
+            <div className="add_panel_wrap" onClick={()=>{console.log(123123);this.setState({cols:5})}}>
               <Icon iconClass={"lugia-icon-reminder_plus"} />
               &nbsp;<span>增加区块</span>
             </div>
@@ -666,7 +651,8 @@ class ReactDragLayout extends React.Component {
             </div>
           </FloatingWindowcontent>
         </FloatingWindowContainer>
-        <CarouselContainer>
+        
+        <CarouselContainer style={{bottom: this.state.selectLayout === -1 ? '-300px' : '16px' }}>
           <MyCarousel>
             <NextButton onClick={this.previous}>
               <Icon iconClass={"lugia-icon-direction_caret_left"} />
@@ -684,8 +670,8 @@ class ReactDragLayout extends React.Component {
               >
                 {this.state.listImg.map((item, index) => (
                   <CarouselItem last={index === this.state.listImg.length - 1}>
-                    <ImgWrap>
-                      <img src={item.url} alt={item.title} />
+                    <ImgWrap className={item.id === this.state.modelSelect?'modelSelect':''} onClick={() => this.selectModule(item)}>
+                      <img src={item.thumbnail} alt={item.title} />
                     </ImgWrap>
                     <ImgTitle>{item.title}</ImgTitle>
                   </CarouselItem>
@@ -694,74 +680,10 @@ class ReactDragLayout extends React.Component {
             </ViewingArea>
           </MyCarousel>
           <OperationWrap>
-            <OperationUseWrap>使用</OperationUseWrap>
-            <OperationCanleWrap>取消</OperationCanleWrap>
+            <OperationUseWrap onClick={this.userTheme}>使用</OperationUseWrap>
+            <OperationCanleWrap onClick={this.cancelSelect}>取消</OperationCanleWrap>
           </OperationWrap>
         </CarouselContainer>
-        {this.state.visible && (
-          <RCAlign
-            align={{
-              points: ["tr", "bl"],
-              offset: [-12, 12],
-              useCssTransform: true,
-              overflow: { adjustX: true, adjustY: true }
-            }}
-            target={this.getTarget}
-          >
-            <Modal></Modal>
-          </RCAlign>
-        )}
-        {/*         
-        <FloatingWindowContainer style={{right:this.state.floatingWindowState===0?'-250px':'0'}}>
-          <FloatingWindonLeftContainer>
-            <FloatingWindonLeft onClick={()=>{this.state.floatingWindowState===0?this.setState({floatingWindowState:1}):this.setState({floatingWindowState:0})}}>
-              .
-              .
-              .
-              .
-            </FloatingWindonLeft>
-            { this.state.floatingWindowState === 2 &&
-              <FloatingWindowRight  onClick={()=>{}} >
-                <Icon iconClass={"lugia-icon-financial_layout"}/>
-              </FloatingWindowRight>
-            }
-          </FloatingWindonLeftContainer>
-          <FloatingWindowcontent >
-            <div className="lable">
-              <span>水平间距<i>(px)</i></span>
-              <span>垂直间距<i>(px)</i></span>
-            </div>
-            <div className="input_group">
-              <div className="input_wrap">
-                <Theme config={inputView}><NumberInput size={"small"} value={this.state.value}></NumberInput></Theme>
-              </div>
-              <div className="input_wrap">
-                <Theme config={inputView}><NumberInput size={"small"} value={this.state.value}></NumberInput></Theme>
-              </div>
-            </div>
-            <div className="input_cols_wrap">
-              <p className="input_cols_lable">栅格数：</p>
-              <div className="input_cols_slider">
-              {this.state.floatingWindowState===1 &&<Theme config={sliderView}>
-                  <Slider defaultValue={2} tips marks={{
-                    2: '2',
-                    3: '3',
-                    4: '4',
-                    6: '6',
-                    8: '8',
-                    12: '12',
-                  }}/>
-                </Theme>}
-              </div>
-            </div>
-            <div className="add_panel_wrap">
-              <Icon iconClass={"lugia-icon-reminder_plus"}/>&nbsp;<span>增加区块</span>
-            </div>
-            <div className="shrink_wrap">
-              <Icon iconClass={"lugia-icon-direction_arrows_alt"}/>
-            </div>
-          </FloatingWindowcontent>
-        </FloatingWindowContainer> */}
       </React.Fragment>
     );
   }
