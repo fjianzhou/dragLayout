@@ -1,8 +1,12 @@
 import React from 'react'
-
-const Modular4 = React.memo(() =>{
-  return <div>Modular4</div>
-});
-Modular4.src = 'http://img.zcool.cn/community/01c31a5dc24dbca8012163babc1e2a.jpg@2o.jpg'
+import xxx from '../imge/color_img_theme_jiguang.png'
+class Modular4 extends React.PureComponent{
+  render(){
+    return <div>Modular2</div>
+  }
+}
+Modular4.src= xxx
 Modular4.title = 'Modular4'
-export default Modular4
+export default  Modular4
+
+

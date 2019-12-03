@@ -58,7 +58,7 @@ block--modifier代表 block 的不同状态或不同版本
     
     - draggableCancel: ?string = '.className'  有这个类名的标签元素无法拖住移动，其他元素均可拖动
     
-    - draggableHandle: ?string = '.className'  处了有这个类名的标签元素可以拖住移动，其他元素均不可拖住移动
+    - draggableHandle: ?string = '.className'  除了有这个类名的标签元素可以拖住移动，其他元素均不可拖住移动
     
     - compactType: ?('vertical' | 'horizontal') = 'vertical'  排布优先垂直或水平  
     

@@ -1,3 +1,4 @@
+import React from 'react'
 import M1 from './modular1'
 import M2 from './modular2'
 import M3 from './modular3'

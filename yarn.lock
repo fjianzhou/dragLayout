@@ -1246,7 +1246,7 @@
     "@babel/runtime" "^7.4.5"
     "@lugia/object-utils" "^1.0.15"
 
-"@lugia/theme-css-hoc@^1.0.62":
+"@lugia/theme-css-hoc@^1.0.62", "@lugia/theme-css-hoc@^1.0.63":
   version "1.0.63"
   resolved "https://registry.yarnpkg.com/@lugia/theme-css-hoc/-/theme-css-hoc-1.0.63.tgz#1c61ef1fde1fdc18755d386596d0b74dad593f3d"
   integrity sha512-XjQbmQ5iWiwyM8oLEnlv0akxcwRju8+KgAvFgxvh+MUd3nHAYL7iqXbafSFXiN1bEC8KulO/ETCAXh1463shIw==
@@ -1266,7 +1266,7 @@
   dependencies:
     "@lugia/react-devtools-core" "^1.0.3"
 
-"@lugia/theme-hoc@^1.0.47":
+"@lugia/theme-hoc@^1.0.47", "@lugia/theme-hoc@^1.0.48":
   version "1.0.48"
   resolved "https://registry.yarnpkg.com/@lugia/theme-hoc/-/theme-hoc-1.0.48.tgz#a1557271dfb91986a43954824a33cda4d39f53c6"
   integrity sha512-kSMtX24JMO0NISnyhBRWPH1xqlHp/IG+OdlIkYt8xj3WsbHGaIEOOBzrzxiNPbVzElsXEbznJU9qKykGe8bONQ==

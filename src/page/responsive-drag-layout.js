@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components";
+import styled,{css} from "styled-components";
 import ReactGridLayout,{WidthProvider} from "react-grid-layout";
 import "./grid-layout.css";
 import MyTest from "../components/my-test";
@@ -10,7 +10,9 @@ import Theme from "@lugia/lugia-web/dist/theme";
 import Widgets from "@lugia/lugia-web/dist/consts";
 import { getBorder } from "@lugia/theme-utils";
 import { Modal } from "../components";
-import config from '../indexPageConfig'
+import config from '../IndexModular/index'
+import CSSComponent from '@lugia/theme-css-hoc';
+import ThemeProvider from '@lugia/theme-hoc';
 console.log('config',config)
 
 const GridLayout = WidthProvider(ReactGridLayout);
@@ -166,20 +168,49 @@ const MyCarousel = styled.div`
   overflow: hidden;
   padding: 0 32px;
 `;
-const NextButton = styled.span`
+
+const NextButton = CSSComponent({
+  tag: 'span',
+  className: 'ButtonOut',
+  normal:{
+    selectNames: [['color']],
+    defaultTheme: {color: '#cccccc'},
+  },
+  hover: {
+    selectNames: [['color']],
+    defaultTheme: {color: '#4d68ff'},
+  },
+  active: {
+    selectNames: [['color']],
+    defaultTheme: {color: '#394dbf'}
+  },
+  disabled:{
+    electNames: [['color']],
+    defaultTheme: {color: 'red'},
+  },
+  css: css`
   display: inline-block;
   position: absolute;
   left: 0;
   width: 32px;
   text-align: center;
-  color: #cccccc;
-  &:hover {
-    color: #4d68ff;
-  }
-  &:active {
-    color: #394dbf;
-  }
-`;
+  `,
+  option: { hover: true, active: true },
+})
+// const NextButton = styled.span`
+//   display: inline-block;
+//   position: absolute;
+//   left: 0;
+//   width: 32px;
+//   text-align: center;
+//   color: #cccccc;
+//   &:hover {
+//     color: #4d68ff;
+//   }
+//   &:active {
+//     color: #394dbf;
+//   }
+// `;
 
 const PreButton = styled.span`
   display: inline-block;
@@ -347,39 +378,59 @@ let gridCofing ={
   rowHeight:50,
 }
 
-const initGridItem = () => {
-  let girdItemData = [];
-  for (let i =0; i<5; i++){
-    let item = {
-      key: item,
-      x: i * 2,
-      y: 0,
-      w: 6,
-      h: 3
-    }
-  }
-}
 
+export default ThemeProvider(
 class ReactDragLayout extends React.Component {
   constructor() {
     super();
+    let temObj = {...config};
+    this.selectedModular =[];
+    debugger
+    let localStroageConfig = JSON.parse(localStorage.getItem('name')) || [];
+    // 匹配关联展示模块
+    localStroageConfig && localStroageConfig.gridItems && localStroageConfig.gridItems.length>0 &&localStroageConfig.gridItems.forEach((item)=>{
+      let key = item.key;
+      let modular = temObj[key];
+      if(modular){
+        item.component = modular
+        delete temObj[key] 
+      }
+    })
+    let items = localStroageConfig.gridItems.length > 0 ?[...localStroageConfig.gridItems] : init() ;
+    // 剩余未匹配模块
+    for(let key in temObj){
+      let obj = temObj[key];
+      this.selectedModular.push({titel:obj.title,thumbnail:obj.src,id:key,component:obj})
+    }
+
+
+    function init() {
+      let arr = [];
+      for (let i=0;i<5;i++){
+        arr.push(
+        {
+          key: i,
+          x: 6 * (i % 2),
+          y: 3 * (parseInt(i/2)),
+          w: 6,
+          h: 3,
+        })
+      }
+      return arr;
+    }
+
+    
+
+
     this.state = {
-      items: ["a", "b", "c"].map((item, index) => {
-        return {
-          key: item,
-          x: index * 2,
-          y: 0,
-          w: 5,
-          h: 5
-        };
-      }),
+      items,
       dragMoveLayout: -1,
       selectLayout: -1,
       floatingWindowState: 0, // 浮窗的状态
       value: 1,
       value1: 2,
       isEdit: false,
-      listImg: [...config],
+      listImg: this.selectedModular,
       imgIndex: 0, 
       offsetX: 0,
       allWidth: 30000,
@@ -391,32 +442,49 @@ class ReactDragLayout extends React.Component {
       rowHeight: gridCofing.rowHeight
     };
   }
+  onResizeStart = () => {
+    this.layoutState = "";
+    this.resize = true;
+    console.log("onResize");
+  }
+  onResize = () =>{
+    console.log("onResize");
+    if (this.resize) {
+      this.layoutState = "resize";
+      this.resize = false;
+    }
+  }
+  onResizeStop = () =>{
+    console.log("onResizeStop");
+  }
+ 
   onDragStart = (layout, oldItem, newItem, placeholder, e, element) => {
     this.layoutState = "";
     this.move = true;
     console.log("onDragStart");
-  };
-  onDragStop = (layout, oldItem, newItem, placeholder, e, element) => {
-    this.setState({ dragMoveLayout: -1 });
-    this.move = false;
-    console.log("onDragStop");
   };
   onDrag = (layout, oldItem, newItem, placeholder, e, elemen) => {
     console.log("onDrag");
     if (this.move) {
       this.layoutState = "move";
       this.move = false;
-      this.setState({ dragMoveLayout: oldItem.i });
     }
   };
+  onDragStop = (layout, oldItem, newItem, placeholder, e, element) => {
+    this.move = false;
+    this.layoutState = "";
+  };
+
 
   /**
    * 选择单个面板并显示控件选择框
    */
   selectedPanel = layout => {
-    if (layout.key === this.state.selectLayout || this.state.isEdit === false)
+    console.log('selectedPanel',this.layoutState,layout.id,this.state.selectLayout,this.state.isEdit )
+    if (layout.id === this.state.selectLayout || this.state.isEdit === false)
       return false;
-    if (this.layoutState !== "move" && this.state.isEdit) {
+    if (this.layoutState !== "move" && this.layoutState !== "resize" && this.state.isEdit) {
+      console.log('selectedPanel222' )
       this.setState({
         selectLayout: layout.key,
         isEdit: false,
@@ -516,15 +584,47 @@ class ReactDragLayout extends React.Component {
   };
 
   userTheme = () =>{
-    let tem =  config.filter((item)=>{
+    let tem =  this.selectedModular.filter((item)=>{
       return item.id === this.state.modelSelect
     })
-    this.setState({xx:tem[0].fn,selectLayout:-1});
+    console.log('userTheme', tem)
+    let items = this.state.items.map((data)=>{
+      console.log(data.id,'=====',this.state.selectLayout)
+      if(data.key === this.state.selectLayout){
+        data.component = tem[0].component
+        data.id = tem[0].id
+        return  data
+      }
+      return data;
+    })
+    console.log('newitems',items)
+    this.setState({items:[...items],selectLayout:-1});
   }
   cancelSelect = () => {
     this.setState({selectLayout:-1})
+
+    // let data = {
+    //   gridData:{ // 拖拽板块数据
+    //     gridItems:[  // 拖拽项数据
+    //       {
+    //         id: 'modular1', // 关联的模块id （没有为空）
+    //         key: 1, // 拖拽块的唯一表示
+    //         x: 1, // x轴位置 （栅栏）
+    //         y: 2, // y轴位置（栅栏）
+    //         w: 3, // 宽度站位（栅栏）
+    //         h: 4, // 高度站位（rowHeight）
+    //       }
+          
+    //     ],
+    //     cols: 12, // 栅栏数
+    //     margin:[10,10], //拖拽区域之间的间距
+    //   }
+    // }
   }
   selectModule = (item) => {this.setState({modelSelect:item.id})}
+
+ 
+
 
   render() {
     let dataItem = this.state.items;
@@ -537,13 +637,14 @@ class ReactDragLayout extends React.Component {
           isResizable={this.state.isEdit}
           style={layoutStyle}
           verticalCompact={false}
-          onDrag={this.onDrag}
           rowHeight={this.state.rowHeight}
           onDragStart={this.onDragStart}
+          onDrag={this.onDrag}
           onDragStop={this.onDragStop}
-          onResize={() => {}}
-          onResizeStop={() => {}}
           compactType={"vertical"}
+          onResizeStart={this.onResizeStart}
+          onResize={this.onResize}
+          onResizeStop={this.onResizeStop}
         >
           {dataItem.map(item => (
             <GridItemContainer
@@ -555,7 +656,7 @@ class ReactDragLayout extends React.Component {
               key={item.key}
               data-grid={item}
             >
-              {this.state.selectLayout === item.key && (
+              {this.state.selectLayout === item.id && (
                 <DeleteWrap ref={this.containerRef} id="xxxxx">
                   <Icon
                     iconClass={"lugia-icon-reminder_minus_circle"}
@@ -654,7 +755,7 @@ class ReactDragLayout extends React.Component {
         
         <CarouselContainer style={{bottom: this.state.selectLayout === -1 ? '-300px' : '16px' }}>
           <MyCarousel>
-            <NextButton onClick={this.previous}>
+            <NextButton onClick={this.previous}  themeProps={this.props.getPartOfThemeProps('Container')} >
               <Icon iconClass={"lugia-icon-direction_caret_left"} />
             </NextButton>
             <PreButton onClick={this.next}>
@@ -687,5 +788,8 @@ class ReactDragLayout extends React.Component {
       </React.Fragment>
     );
   }
-}
-export default ReactDragLayout;
+},
+'xxx',
+{ hover: true, active: true, focus: true }
+)
+

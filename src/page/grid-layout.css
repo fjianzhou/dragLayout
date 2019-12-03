@@ -45,6 +45,7 @@
   border: 18px solid;
   border-color: transparent #FFFFFF #FFFFFF transparent;
   cursor: se-resize;
+  z-index: 1001;
 }
 
 .react-grid-item > .react-resizable-handle::after {
