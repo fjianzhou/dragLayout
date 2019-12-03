@@ -13,6 +13,7 @@ import { Modal } from "../components";
 import config from '../IndexModular/index'
 import CSSComponent from '@lugia/theme-css-hoc';
 import ThemeProvider from '@lugia/theme-hoc';
+import {initGridItems, initLocalStorageGridItem} from '../util/gridLayout'
 console.log('config',config)
 
 const GridLayout = WidthProvider(ReactGridLayout);
@@ -385,39 +386,35 @@ class ReactDragLayout extends React.Component {
     super();
     let temObj = {...config};
     this.selectedModular =[];
-    debugger
-    let localStroageConfig = JSON.parse(localStorage.getItem('name')) || [];
-    // 匹配关联展示模块
-    localStroageConfig && localStroageConfig.gridItems && localStroageConfig.gridItems.length>0 &&localStroageConfig.gridItems.forEach((item)=>{
-      let key = item.key;
-      let modular = temObj[key];
-      if(modular){
-        item.component = modular
-        delete temObj[key] 
-      }
-    })
-    let items = localStroageConfig.gridItems.length > 0 ?[...localStroageConfig.gridItems] : init() ;
+    let localStroageConfig = JSON.parse(localStorage.getItem('name1')) || [];
+    let items = [];
+    if(localStroageConfig && localStroageConfig.gridItems && localStroageConfig.gridItems.length>0){
+      items = initLocalStorageGridItem(localStroageConfig,temObj).gridItems
+    }else {
+      items = initGridItems().gridItems;
+    }
+    console.log(items)
     // 剩余未匹配模块
     for(let key in temObj){
       let obj = temObj[key];
-      this.selectedModular.push({titel:obj.title,thumbnail:obj.src,id:key,component:obj})
+      this.selectedModular.push({title:obj.title,thumbnail:obj.src,id:key,component:obj})
     }
 
 
-    function init() {
-      let arr = [];
-      for (let i=0;i<5;i++){
-        arr.push(
-        {
-          key: i,
-          x: 6 * (i % 2),
-          y: 3 * (parseInt(i/2)),
-          w: 6,
-          h: 3,
-        })
-      }
-      return arr;
-    }
+    // function init() {
+    //   let arr = [];
+    //   for (let i=0;i<5;i++){
+    //     arr.push(
+    //     {
+    //       key: i,
+    //       x: 6 * (i % 2),
+    //       y: 3 * (parseInt(i/2)),
+    //       w: 6,
+    //       h: 3,
+    //     })
+    //   }
+    //   return arr;
+    // }
 
     
 
@@ -704,7 +701,7 @@ class ReactDragLayout extends React.Component {
             <div className="input_group">
               <div className="input_wrap">
                 <Theme config={inputView}>
-                  <NumberInput
+                  <NumberInput 
                     size={"small"}
                     value={this.state.value}
                   ></NumberInput>
@@ -770,7 +767,7 @@ class ReactDragLayout extends React.Component {
                 }}
               >
                 {this.state.listImg.map((item, index) => (
-                  <CarouselItem last={index === this.state.listImg.length - 1}>
+                  <CarouselItem last={index === this.state.listImg.length - 1} key={index}>
                     <ImgWrap className={item.id === this.state.modelSelect?'modelSelect':''} onClick={() => this.selectModule(item)}>
                       <img src={item.thumbnail} alt={item.title} />
                     </ImgWrap>
